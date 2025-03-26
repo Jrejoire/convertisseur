@@ -37,10 +37,20 @@ export default class ConversionFunction {
     };
 
     const formatTime = (hours) => {
-      const totalMinutes = Math.floor(hours * 60);
-      const minutes = Math.floor(totalMinutes);
-      const seconds = Math.floor((hours * 3600) % 60);
-      return `${minutes.toString().padStart(2, "0")}:${seconds
+      const totalSeconds = Math.floor(hours * 3600);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+
+      // Si le temps est supérieur ou égal à 1 heure
+      if (h >= 1) {
+        return `${h.toString().padStart(2, "0")}:${m
+          .toString()
+          .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+      }
+
+      // Pour les temps inférieurs à 1 heure
+      return `${m.toString().padStart(2, "0")}:${s
         .toString()
         .padStart(2, "0")}`;
     };
