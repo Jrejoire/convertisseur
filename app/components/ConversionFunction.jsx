@@ -28,6 +28,7 @@ export const speedToPace = (speed) => {
 export default class ConversionFunction {
   static calculatePassingTimes(speed) {
     const distances = {
+      "1km": 1,
       "2,5km": 2.5,
       "5km": 5,
       "10km": 10,

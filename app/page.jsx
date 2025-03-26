@@ -84,6 +84,9 @@ export default function Home() {
                       Distance
                     </th>
                     <th scope="col" className="px-6 py-3">
+                      1km
+                    </th>
+                    <th scope="col" className="px-6 py-3">
                       2,5km
                     </th>
                     <th scope="col" className="px-6 py-3">
@@ -105,6 +108,9 @@ export default function Home() {
                     <th scope="row" className="px-6 py-4 font-medium">
                       Temps
                     </th>
+                    <td className="px-6 py-4 text-center">
+                      {passingTimes?.["1km"] || "--:--"}
+                    </td>
                     <td className="px-6 py-4 text-center">
                       {passingTimes?.["2,5km"] || "--:--"}
                     </td>
