@@ -25,24 +25,31 @@ export const speedToPace = (speed) => {
   return minutesToTimeString(minutesPerKm);
 };
 
-export const calculatePassingTimes = (pace, unit) => {
-  // Convertir en minutes par kilomètre si nécessaire
-  const minutesPerKm =
-    unit === "pace" ? timeStringToMinutes(pace) : 60 / parseFloat(pace);
+export default class ConversionFunction {
+  static calculatePassingTimes(speed) {
+    const distances = {
+      "2,5km": 2.5,
+      "5km": 5,
+      "10km": 10,
+      Semi: 21.1,
+      Marathon: 42.195,
+    };
 
-  // Définir les distances en km
-  const distances = {
-    "2,5km": 2.5,
-    "5km": 5,
-    "10km": 10,
-    Semi: 21.1,
-    Marathon: 42.2,
-  };
+    const formatTime = (hours) => {
+      const totalMinutes = Math.floor(hours * 60);
+      const minutes = Math.floor(totalMinutes);
+      const seconds = Math.floor((hours * 3600) % 60);
+      return `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+    };
 
-  // Calculer les temps pour chaque distance
-  return Object.entries(distances).reduce((acc, [key, distance]) => {
-    const totalMinutes = minutesPerKm * distance;
-    acc[key] = minutesToTimeString(totalMinutes);
-    return acc;
-  }, {});
-};
+    const times = {};
+    for (const [distance, km] of Object.entries(distances)) {
+      const timeInHours = km / speed;
+      times[distance] = formatTime(timeInHours);
+    }
+
+    return times;
+  }
+}

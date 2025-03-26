@@ -1,90 +1,58 @@
-import { useState, useEffect } from "react";
-import { paceToSpeed, speedToPace } from "./ConversionFunction";
-import { TimeInput } from "@heroui/date-input";
+import { useState } from "react";
+import ConversionFunction, {
+  speedToPace,
+  paceToSpeed,
+} from "./ConversionFunction";
 
-export default function ConversionTool() {
-  const [time, setTime] = useState("");
-  const [unit, setUnit] = useState("pace");
-  const [result, setResult] = useState(null);
-  const [passingTimes, setPassingTimes] = useState(null);
+export default function ConversionTool({ unit, onConversion }) {
+  const [inputValue, setInputValue] = useState("");
 
-  const handleCalculate = () => {
-    if (!time || time === "00:00") {
-      alert("Veuillez entrer une valeur valide");
-      return;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let convertedValue;
+    let speed;
+
+    if (unit === "pace") {
+      // Si on entre une allure, on calcule la vitesse
+      convertedValue = paceToSpeed(inputValue);
+      speed = parseFloat(convertedValue);
+    } else {
+      // Si on entre une vitesse, on calcule l'allure
+      convertedValue = speedToPace(inputValue);
+      speed = parseFloat(inputValue);
     }
 
-    const convertedValue =
-      unit === "pace"
-        ? paceToSpeed(time) // Convertit min/km en km/h
-        : speedToPace(time); // Convertit km/h en min/km
-
-    setResult({
-      value: convertedValue,
-      unit: unit === "pace" ? "km/h" : "min/km",
-    });
-
-    // Calculer les temps de passage
-    const times = calculatePassingTimes(time, unit);
-    setPassingTimes(times);
+    // Calculer les temps de passage basés sur la vitesse
+    const passingTimes = ConversionFunction.calculatePassingTimes(speed);
+    onConversion(passingTimes, convertedValue);
   };
 
-  // Propager les temps de passage au composant parent
-  useEffect(() => {
-    if (passingTimes) {
-      onPassingTimesCalculated?.(passingTimes);
-    }
-  }, [passingTimes]);
-
   return (
-    <div className="flex flex-col items-center space-y-8">
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-4 scale-150 transform">
-          <TimeInput value={time} onChange={(newTime) => setTime(newTime)} />
-        </div>
-
-        <div className="flex flex-col space-y-4">
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="unit"
-              value="pace"
-              checked={unit === "pace"}
-              onChange={(e) => setUnit(e.target.value)}
-              className="text-blue-500 w-4 h-4"
-            />
-            <span className="ml-2 text-gray-300">min/km</span>
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="unit"
-              value="speed"
-              checked={unit === "speed"}
-              onChange={(e) => setUnit(e.target.value)}
-              className="text-blue-500 w-4 h-4"
-            />
-            <span className="ml-2 text-gray-300">km/h</span>
-          </label>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col items-center">
+        <label className="block text-gray-400 mb-2">
+          {unit === "pace"
+            ? "Entrez votre allure (min:sec/km)"
+            : "Entrez votre vitesse (km/h)"}
+        </label>
+        <input
+          type={unit === "speed" ? "number" : "text"}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={unit === "pace" ? "04:30" : "12.0"}
+          pattern={unit === "pace" ? "[0-9]{2}:[0-9]{2}" : null}
+          step={unit === "speed" ? "0.1" : null}
+          className="w-48 bg-gray-700 text-white rounded p-2 text-center"
+          required
+        />
+        <button
+          type="submit"
+          className="mt-4 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+        >
+          Convertir
+        </button>
       </div>
-
-      <button
-        onClick={handleCalculate}
-        className="px-8 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-lg 
-                 shadow-lg transform w-30"
-      >
-        Calculer
-      </button>
-
-      {result && (
-        <div className="text-center p-4 bg-gray-700 rounded-lg w-full">
-          <span className="text-3xl font-bold text-blue-400">
-            {result.value}
-          </span>
-          <span className="ml-2 text-gray-400">{result.unit}</span>
-        </div>
-      )}
-    </div>
+    </form>
   );
 }

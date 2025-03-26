@@ -5,9 +5,12 @@ import ConversionTool from "./components/ConversionTool";
 
 export default function Home() {
   const [passingTimes, setPassingTimes] = useState(null);
+  const [result, setResult] = useState(null); // Résultat (vitesse ou allure)
+  const [unit, setUnit] = useState("pace"); // Unité sélectionnée (pace ou speed)
 
-  const handlePassingTimesCalculated = (times) => {
+  const handleConversion = (times, convertedValue) => {
     setPassingTimes(times);
+    setResult(convertedValue);
   };
 
   return (
@@ -24,11 +27,33 @@ export default function Home() {
         <main className="space-y-8 h-full">
           <section className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 items-center">
             <h2 className="text-xl font-semibold text-blue-400 mb-6 text-center">
-              Allure à calculer
+              Allure ou Vitesse
             </h2>
-            <ConversionTool
-              onPassingTimesCalculated={handlePassingTimesCalculated}
-            />
+            <div className="flex justify-center mb-4">
+              <label className="mr-4 text-gray-400">
+                <input
+                  type="radio"
+                  name="unit"
+                  value="pace"
+                  checked={unit === "pace"}
+                  onChange={() => setUnit("pace")}
+                  className="mr-2"
+                />
+                Allure (min/km)
+              </label>
+              <label className="text-gray-400">
+                <input
+                  type="radio"
+                  name="unit"
+                  value="speed"
+                  checked={unit === "speed"}
+                  onChange={() => setUnit("speed")}
+                  className="mr-2"
+                />
+                Vitesse (km/h)
+              </label>
+            </div>
+            <ConversionTool unit={unit} onConversion={handleConversion} />
           </section>
 
           {/* Section résultat */}
@@ -37,8 +62,12 @@ export default function Home() {
               Conversion
             </h2>
             <div className="text-center p-4 bg-gray-700 rounded-lg">
-              <span className="text-3xl font-bold text-blue-400">--:--</span>
-              <span className="ml-2 text-gray-400">km/h</span>
+              <span className="text-3xl font-bold text-blue-400">
+                {result || "--:--"}
+              </span>
+              <span className="ml-2 text-gray-400">
+                {unit === "pace" ? "km/h" : "min/km"}
+              </span>
             </div>
           </section>
 
